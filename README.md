@@ -2,7 +2,7 @@
 
 A simple application for screen capturing developed using Microsoft WPF
 
-
+![alt text](https://raw.githubusercontent.com/brvinodh/ScreenCapture/master//Documentation/Images/Basic%20Image.jpg)
 
 Advantages: 
 
