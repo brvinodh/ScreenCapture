@@ -11,6 +11,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ScreenCapture.ViewModel
@@ -23,6 +24,11 @@ namespace ScreenCapture.ViewModel
         private ICommand captureImageCommand;
 
         /// <summary>
+        /// The capture image command
+        /// </summary>
+        private ICommand captureAreaCommand;
+
+        /// <summary>
         /// Represents a message box instance to display the messages to the user
         /// </summary>
         private IMessageBox messageBox;
@@ -30,9 +36,14 @@ namespace ScreenCapture.ViewModel
         /// <summary>
         /// The base folder where the files will be stored
         /// </summary>
-        private IFileHelper fileHelper = null;
+        private IImageFileHelper imageFileHelper = null;
 
         private IWindow uiWindow = null;
+
+        /// <summary>
+        /// Represents an window object to be shown when an area needs to be captured
+        /// </summary>
+        private CaptureAreaVM captureAreaWindow = null;
 
         /// <summary>
         /// Represents a window helper class instance using which all the open window items can be retrieved
@@ -75,15 +86,12 @@ namespace ScreenCapture.ViewModel
             set { showAdvanced = value; this.RaisePropertyChanged(); }
         }
 
-
         public string SnapStatus
         {
             get { return snapStatus; }
             set { snapStatus = value; this.RaisePropertyChanged(); }
         }
-
-
-
+        
         private ExportOptions selectedExportOption = ViewModel.ExportOptions.None;
 
         /// <summary>
@@ -155,12 +163,21 @@ namespace ScreenCapture.ViewModel
 
         public ObservableCollection<ProcessItem> ProcessItems { get; set; } = new ObservableCollection<ProcessItem>();
 
-        public MainVM(IMessageBox messageBox, IFileHelper fileHelper, Func<IWindowHelper> windowHelper
-            , IImageManager wordImageManager, IWindow tempAction)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainVM"/> class.
+        /// </summary>
+        /// <param name="messageBox">The message box.</param>
+        /// <param name="fileHelper">The file helper.</param>
+        /// <param name="windowHelper">The window helper.</param>
+        /// <param name="wordImageManager">The word image manager.</param>
+        /// <param name="tempAction">The temporary action.</param>
+        /// <param name="captureAreaWindow">The capture area window.</param>
+        public MainVM(IMessageBox messageBox, IImageFileHelper fileHelper, Func<IWindowHelper> windowHelper
+            , IImageManager wordImageManager, IWindow tempAction, CaptureAreaVM captureAreaWindow)
         {
             this.messageBox = messageBox;
             //this.methodToGetBaseFolder = methodToGetBaseFolder;
-            this.fileHelper = fileHelper;
+            this.imageFileHelper = fileHelper;
             this.windowHelperfunc = windowHelper;
             this.wordImageManager = wordImageManager;
 
@@ -168,7 +185,28 @@ namespace ScreenCapture.ViewModel
                 this.CaptureImage();
             });
 
+            this.captureAreaCommand = new RelayCommand(() =>
+            {
+                this.CaptureArea();
+            });
+
             this.uiWindow = tempAction;
+            this.captureAreaWindow = captureAreaWindow;
+        }
+
+        private void CaptureArea()
+        {
+            this.uiWindow.HideWin();
+            this.captureAreaWindow.ShowCaptureArea((Rect rect) =>
+            {
+                var image = WindowSnap.GetBitmapInCoordinates((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height) as Bitmap;
+
+                // hide the current window, on complete show it back
+                this.captureAreaWindow.HideCaptureArea();
+                this.uiWindow.ShowWin();
+
+                this.SaveImage(image);
+            });
         }
 
         public ICommand CaptureImageCommand
@@ -178,7 +216,13 @@ namespace ScreenCapture.ViewModel
                 return this.captureImageCommand;
             }
         }
-        
+        public ICommand CaptureAreaCommand
+        {
+            get
+            {
+                return this.captureAreaCommand;
+            }
+        }
 
         /// <summary>
         /// Gets the get all processes command.
@@ -222,8 +266,9 @@ namespace ScreenCapture.ViewModel
         public void CaptureImage()
         {
             Bitmap image = null;
+
             // if the show advanced is not visible;  then always capture the current area
-            if(this.SelectedProcessItem == null || this.ShowAdvanced == false)
+            if (this.SelectedProcessItem == null || this.ShowAdvanced == false)
             {
                 // capture only the background
                 this.uiWindow.HideWin();
@@ -238,11 +283,16 @@ namespace ScreenCapture.ViewModel
             }
 
             string fileName = this.SaveImage(image as Bitmap);
+        }
 
-            if (this.selectedExportOption != ViewModel.ExportOptions.None && !string.IsNullOrEmpty(fileName))
-                this.wordImageManager.AddImageToDocument(fileName);
+        public void CaptureByRect(Rect rect)
+        {
 
-            this.SnapStatus = "Image Captured Successfully";
+            if (rect.IsEmpty == false)
+            {
+                var image = WindowSnap.GetBitmapInCoordinates((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height) as Bitmap;
+                this.SaveImage(image);
+            }
         }
 
 
@@ -254,10 +304,15 @@ namespace ScreenCapture.ViewModel
         {
             try
             {
-                string fileName = this.fileHelper.GetJpegFileName();
+                string fileName = this.imageFileHelper.GetJpegFileName();
                 image.Save(fileName, ImageFormat.Jpeg);
 
-                return fileName;   
+                // save to word
+                if (this.selectedExportOption != ViewModel.ExportOptions.None && !string.IsNullOrEmpty(fileName))
+                    this.wordImageManager.AddImageToDocument(fileName);
+
+                this.SnapStatus = "Image Captured Successfully";
+                return fileName;
             }
             catch (Exception ex)
             {

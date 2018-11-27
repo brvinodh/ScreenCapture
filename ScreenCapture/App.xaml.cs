@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ScreenCapture
 {
@@ -22,11 +23,26 @@ namespace ScreenCapture
         {
             var window = new MainWindow();
             messageBox = new CustomMessageBox();
-            var fileHelper = new FileHelper(this.GetBaseFolderLocation);
+            var fileHelper = new ImageFileHelper(this.GetBaseFolderLocation);
             var imageManger = new WordImageManager(messageBox, fileHelper);
-            window.DataContext = new MainVM(messageBox, fileHelper, ()=> { return new WindowsHandler(); }, imageManger
-                , window);
+
+            var captureWindow = new CaptureArea();
+            var captureAreaVM = new CaptureAreaVM(fileHelper, captureWindow);
+            captureWindow.DataContext = captureAreaVM;
+            // the idea behind passing parameters as function is delay the execution so that the boot time is faster
+            window.DataContext = new MainVM(messageBox, fileHelper, () => { return new WindowsHandler(); }, imageManger
+                , window, captureAreaVM);
             window.Show();
+
+            //CaptureArea m = new CaptureArea()
+            //{
+            //    WindowStartupLocation = WindowStartupLocation.Manual,
+            //    WindowStyle = WindowStyle.None,
+            //    AllowsTransparency = true,
+            //    Background = (true ? new SolidColorBrush(Color.FromArgb(1, 0, 0, 0)) : Brushes.WhiteSmoke)
+            //};
+            //var color = Color.FromArgb(1, 0, 0, 0);
+            //m.Show();
         }
 
         private string GetBaseFolderLocation()

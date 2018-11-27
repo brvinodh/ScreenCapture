@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ScreenCapture
 {
@@ -32,26 +33,30 @@ namespace ScreenCapture
             InitializeComponent();
             this.Left = SystemParameters.PrimaryScreenWidth - this.Width;
 
-            Loaded += (s, e) =>
-            {
-                _hotkey = new HotKey( ModifierKeys.Alt, Key.NumPad9, this);
-                _hotkey.HotKeyPressed += (k) =>
-                {
-                    Console.WriteLine("Yo im invoked");
-                };
-            };
+            //Loaded += (s, e) =>
+            //{
+            //    _hotkey = new HotKey( ModifierKeys.Alt, Key.NumPad9, this);
+            //    _hotkey.HotKeyPressed += (k) =>
+            //    {
+            //        Console.WriteLine("Yo im invoked");
+            //    };
+            //};
             // ScreenshotHelper.CaptureImage();
         }
-
+        private Action EmptyDelegate = delegate () {};
+        private bool isVisible = true;
         public void HideWin()
         {
             this.Hide();
+            EmptyDelegate = () => { this.Hide(); };
             // give sufficient time after hide so that the window can disappear
+            //this.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
             System.Threading.Thread.Sleep(300);
         }
 
         public void ShowWin()
         {
+            this.isVisible = true;
             this.Show();
         }
     }

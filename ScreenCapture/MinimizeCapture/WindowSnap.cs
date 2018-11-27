@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text;
 namespace MinimizeCapture
@@ -263,7 +264,22 @@ namespace MinimizeCapture
 			return bitmap;
 		}
 
-		[DllImport("user32", CharSet=CharSet.None, ExactSpelling=false)]
+        public static System.Drawing.Image GetBitmapInCoordinates(int left, int top, int  width, int height)
+        {
+            var bounds = System.Windows.SystemParameters.WorkArea;
+           
+            Bitmap bitmap = new Bitmap(width, height);
+            using (Graphics graphic = Graphics.FromImage(bitmap))
+            {
+                int x = (int)bounds.X;
+                Rectangle rectangle = new Rectangle((int)left, (int)top, (int)height, (int)width);
+                graphic.CopyFromScreen((int)left, rectangle.Y, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
+            }
+
+            return bitmap;
+        }
+
+        [DllImport("user32", CharSet=CharSet.None, ExactSpelling=false)]
 		private static extern IntPtr GetParent(IntPtr hWnd);
 
 		private static Bitmap GetWindowImage(IntPtr hWnd, System.Drawing.Size size)

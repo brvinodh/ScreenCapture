@@ -8,11 +8,12 @@ namespace ScreenCapture.Helpers.Implementations
 {
     using ScreenCapture.Helpers.Abstract;
     using System;
+    using System.Drawing;
 
     /// <summary>
     /// A file helper class for getting temporary file names
     /// </summary>
-    internal class FileHelper : IFileHelper
+    internal class ImageFileHelper : IImageFileHelper
     {
         /// <summary>
         /// The method to get base folder; this helps in delayed execution and imporves boot up performance.
@@ -23,7 +24,7 @@ namespace ScreenCapture.Helpers.Implementations
         /// The base folder location in which the files needs to be created
         /// </summary>
         private string baseFolderLocation = string.Empty;
-        public FileHelper(Func<string> baseFolderLocationMethod)
+        public ImageFileHelper(Func<string> baseFolderLocationMethod)
         {
             this.methodToGetBaseFolder = baseFolderLocationMethod;
         }
@@ -54,6 +55,21 @@ namespace ScreenCapture.Helpers.Implementations
             string fileName = System.IO.Path.Combine(this.baseFolderLocation, DateTime.Now.ToString("yyyy-MM-dd-HHmmssfff") + ".docx");
 
             return fileName;
+        }
+
+        public string Save(Bitmap bitmap)
+        {
+            try
+            {
+                string fileName = this.GetJpegFileName();
+                bitmap.Save(fileName);
+                return fileName;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }    
         }
     }
 }

@@ -84,6 +84,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CaptureArea.xaml.cs">
+      <DependentUpon>CaptureArea.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\Abstract\IFileHelper.cs" />
     <Compile Include="Helpers\Abstract\IImageManager.cs" />
     <Compile Include="Helpers\Abstract\IWindow.cs" />
@@ -96,9 +99,14 @@
     <Compile Include="MinimizeCapture\WindowSnap.cs" />
     <Compile Include="MinimizeCapture\WindowSnapCollection.cs" />
     <Compile Include="MinimizeCapture\XPAppearance.cs" />
+    <Compile Include="ViewModel\CaptureAreaVM.cs" />
     <Compile Include="ViewModel\ExportOptionItem.cs" />
     <Compile Include="ViewModel\MainVM.cs" />
     <Compile Include="Helpers\Implementations\WindowsHandler.cs" />
+    <Page Include="CaptureArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

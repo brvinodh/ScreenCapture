@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:ScreenCapture"        
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d" Topmost="True"
-        Title="Screen Capture" Height="450" Width="600" SizeToContent="WidthAndHeight" WindowStartupLocation="Manual" Top="5" ResizeMode="NoResize" ShowMinButton="False" ShowMaxRestoreButton="False" Visibility="{Binding IsApplicationVisible, Mode=TwoWay, NotifyOnSourceUpdated=True, Converter={StaticResource BooleanToVisibilityConverter}}">
+        Title="Screen Capture" Height="450" Width="600" SizeToContent="WidthAndHeight" WindowStartupLocation="Manual" Top="5" ResizeMode="NoResize" ShowMinButton="False" ShowMaxRestoreButton="False" Visibility="{Binding IsApplicationVisible, Mode=TwoWay, NotifyOnSourceUpdated=True, Converter={StaticResource BooleanToVisibilityConverter}}" >
     <Controls:MetroWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Controls:MetroWindow.Resources>
@@ -26,7 +26,7 @@
                 </StackPanel>
             </Button>
 
-            <Button Grid.Column="0" Style="{DynamicResource SquareButtonStyle}" Margin="10" Height="40"  Name="captureButtonArea" Command="{Binding CaptureImageCommand}" Padding="20,0">
+            <Button Grid.Column="0" Style="{DynamicResource SquareButtonStyle}" Margin="10" Height="40"  Name="captureButtonArea" Command="{Binding CaptureAreaCommand}" Padding="20,0">
                 <StackPanel Orientation="Horizontal">
                     <fa:FontAwesome Icon="CameraRetro" FontSize="30" Margin="0, 3,10,0" >
                     </fa:FontAwesome>

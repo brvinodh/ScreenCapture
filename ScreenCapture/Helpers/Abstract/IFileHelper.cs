@@ -4,12 +4,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Drawing;
+
 namespace ScreenCapture.Helpers.Abstract
 {
     /// <summary>
     /// File helper class
     /// </summary>
-    internal interface IFileHelper
+    internal interface IImageFileHelper
     {
         /// <summary>
         /// A method which returns a random meaning full jpeg file name
@@ -22,5 +24,12 @@ namespace ScreenCapture.Helpers.Abstract
         /// </summary>
         /// <returns> returns a  meaning full doc file name</returns>
         string GetWordFileName();
+
+        /// <summary>
+        /// Saves the specified bitmap to Filesystem and returns the file name
+        /// </summary>
+        /// <param name="bitmap">The bitmap.</param>
+        /// <returns></returns>
+        string Save(Bitmap bitmap);
     }
 }
